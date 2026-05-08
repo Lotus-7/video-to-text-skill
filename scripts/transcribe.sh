@@ -7,7 +7,7 @@
 
 set -e -o pipefail
 
-WHISPER_WORKSPACE="/Users/lotus-7/whisper_workspace"
+WHISPER_WORKSPACE="${WHISPER_WORKSPACE:-/Users/lotus-7/whisper_workspace}"
 
 # 检查参数
 if [ "$#" -lt 1 ]; then
@@ -23,6 +23,11 @@ if [ ! -f "$VIDEO_FILE" ]; then
     exit 1
 fi
 
+# 记录日志的辅助函数
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [transcribe] $1"
+}
+
 # 获取视频目录和文件名
 VIDEO_DIR="$(dirname "$VIDEO_FILE")"
 VIDEO_BASENAME="$(basename "$VIDEO_FILE")"
@@ -37,11 +42,6 @@ if [ -f "$TXT_FILE" ]; then
     echo "警告: 转录文件已存在，跳过" >&2
     exit 0
 fi
-
-# 记录日志的辅助函数
-log() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [transcribe] $1"
-}
 
 log "开始转录: $VIDEO_BASENAME"
 
@@ -65,10 +65,20 @@ bash "$TRANSCRIBE_SCRIPT" "$VIDEO_FILE" 2>&1 | while read -r line; do
         echo "$line" >&2
     fi
 done
+TRANSCRIBE_EXIT=${PIPESTATUS[0]}
+if [ $TRANSCRIBE_EXIT -ne 0 ]; then
+    echo "错误: 转录失败 (退出码: $TRANSCRIBE_EXIT)" >&2
+    exit 1
+fi
 
 # 检查转录结果
 if [ ! -f "$TXT_FILE" ]; then
     echo "错误: 转录失败，未生成文本文件" >&2
+    exit 1
+fi
+
+if [ ! -s "$TXT_FILE" ]; then
+    echo "错误: 转录文件为空" >&2
     exit 1
 fi
 
