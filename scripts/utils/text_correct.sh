@@ -33,7 +33,7 @@ for yaml_file in "$DICT_DIR"/*.yaml; do
         # 跳过注释行和空行
         while IFS= read -r line; do
             # 跳过注释和空行
-            if [[ "$line" =~ ^[[:space:]]*# ]] || [[ -z "${line// }" ]]; then
+            if [[ "$line" =~ ^[[:space:]]*# ]] || [[ ! "$line" =~ [^[:space:]] ]]; then
                 continue
             fi
 
@@ -42,8 +42,10 @@ for yaml_file in "$DICT_DIR"/*.yaml; do
                 WRONG="${BASH_REMATCH[1]}"
                 CORRECT="${BASH_REMATCH[2]}"
 
-                # 应用替换 (全局替换)
-                CONTENT=$(echo "$CONTENT" | sed "s/$WRONG/$CORRECT/g")
+                # Escape special sed characters
+                WRONG_ESCAPED=$(echo "$WRONG" | sed 's/[&/\]/\\&/g')
+                CORRECT_ESCAPED=$(echo "$CORRECT" | sed 's/[&/\]/\\&/g')
+                CONTENT=$(echo "$CONTENT" | sed "s/$WRONG_ESCAPED/$CORRECT_ESCAPED/g")
             fi
         done < "$yaml_file"
     fi
