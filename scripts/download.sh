@@ -5,7 +5,7 @@
 # 参数: $1 = 目标目录, $2 = 视频URL
 # 输出: 下载的视频文件路径 (stdout) 或错误信息 (stderr, 退出码非0)
 
-set -e
+set -e -o pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -15,16 +15,23 @@ if [ "$#" -lt 2 ]; then
     exit 1
 fi
 
-TARGET_DIR="$1"
-URL="$2"
+# 检查依赖
+if ! command -v yt-dlp &> /dev/null; then
+    echo "错误: yt-dlp 未安装" >&2
+    exit 1
+fi
 
 # 创建目标目录
-mkdir -p "$TARGET_DIR"
+TARGET_DIR="$1"
+URL="$2"
 
 # 记录日志的辅助函数
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] [download] $1"
 }
+
+# 创建目标目录
+mkdir -p "$TARGET_DIR"
 
 log "开始下载: $URL"
 
@@ -38,6 +45,13 @@ if [[ "$URL" == *"douyin.com"* ]]; then
         python3 "$DOUYIN_SCRIPT" "$TARGET_DIR" "$URL" 2>&1 | while read -r line; do
             log "$line"
         done
+
+        # 检查 Python 脚本是否成功执行
+        DOUYIN_EXIT_CODE=${PIPESTATUS[0]}
+        if [ $DOUYIN_EXIT_CODE -ne 0 ]; then
+            echo "错误: 抖音解析脚本执行失败 (退出码: $DOUYIN_EXIT_CODE)" >&2
+            exit 1
+        fi
 
         # 查找下载的视频文件
         VIDEO_FILE=$(find "$TARGET_DIR" -type f \( -name "*.mp4" -o -name "*.mov" \) -mmin -1 | head -1)
@@ -57,7 +71,7 @@ fi
 log "使用 yt-dlp 下载"
 
 # 先获取视频标题 (用于文件名)
-TITLE=$(yt-dlp --get-title "$URL" 2>/dev/null || echo "video")
+TITLE=$(yt-dlp --get-title "$URL" 2>/dev/null || echo "video_$(date +%s)")
 
 # 下载视频
 yt-dlp -P "$TARGET_DIR" \
