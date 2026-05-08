@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e -o pipefail
 
 # lang_detect.sh - 简繁体检测工具
 # 用途: 检测文本是否包含繁体字
@@ -21,20 +22,15 @@ fi
 # 这里使用一些高频繁体字作为样本
 TRADITIONAL_SAMPLE="個們來過對還時會機樣這麼種樣資專案軟體網路程式資料庫硬碟伺服器滑鼠資料夾"
 
-# 统计文件中繁体字的出现次数
-TRAD_COUNT=0
-TOTAL_CHARS=0
+# 使用 grep 高效统计中文字符总数 (CJK Unified Ideographs 范围)
+TOTAL_CHARS=$(grep -o '[一-龥]' "$TXT_FILE" 2>/dev/null | wc -l | tr -d ' ' || echo "0")
 
-# 读取文件并统计
-while IFS= read -r -n1 char; do
-    # 跳过空格、标点、数字、英文字母
-    if [[ ! "$char" =~ [[:space:][:punct:][:digit:][:alpha:]] ]]; then
-        TOTAL_CHARS=$((TOTAL_CHARS + 1))
-        if [[ "$TRADITIONAL_SAMPLE" == *"$char"* ]]; then
-            TRAD_COUNT=$((TRAD_COUNT + 1))
-        fi
-    fi
-done < "$TXT_FILE"
+# 统计繁体字样本的出现次数
+TRAD_COUNT=0
+for char in $(echo "$TRADITIONAL_SAMPLE" | grep -o .); do
+    COUNT=$(grep -o "$char" "$TXT_FILE" 2>/dev/null | wc -l | tr -d ' ' || echo "0")
+    TRAD_COUNT=$((TRAD_COUNT + COUNT))
+done
 
 # 计算繁体字比例
 if [ $TOTAL_CHARS -eq 0 ]; then
