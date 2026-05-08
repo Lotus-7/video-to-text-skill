@@ -69,7 +69,3 @@ generate_report: true
 ## 许可证
 
 MIT License
-
-## 作者
-
-由小七大人的哆啦A梦精心维护
