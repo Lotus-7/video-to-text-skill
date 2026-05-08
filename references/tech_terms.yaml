@@ -1,0 +1,19 @@
+# 专业术语纠正表
+# 格式: "错误": "修正"
+
+# AI/技术术语
+"减锁增强生成": "检索增强生成"
+"大圆模型": "大语言模型"
+"解鎖": "检索"
+"Cloud Code": "Claude Code"
+"Cloth Code": "Claude Code"
+"Open Cloud": "Continue"
+"MACDOWN": "Markdown"
+"web coding": "Software 2.0"
+"Chat GPT": "ChatGPT"
+"Notebook LM": "NotebookLM"
+"LMWiki": "LLM Wiki"
+
+# 平台名称
+"小龍蝦": "Continue"
+"Obsidian筆記": "Obsidian笔记"
