@@ -43,9 +43,9 @@ for yaml_file in "$DICT_DIR"/*.yaml; do
                 CORRECT="${BASH_REMATCH[2]}"
 
                 # Escape special sed characters
-                WRONG_ESCAPED=$(echo "$WRONG" | sed 's/[&/\]/\\&/g')
-                CORRECT_ESCAPED=$(echo "$CORRECT" | sed 's/[&/\]/\\&/g')
-                CONTENT=$(echo "$CONTENT" | sed "s/$WRONG_ESCAPED/$CORRECT_ESCAPED/g")
+                WRONG_ESCAPED=$(printf '%s\n' "$WRONG" | sed 's/[&/\]/\\&/g')
+                CORRECT_ESCAPED=$(printf '%s\n' "$CORRECT" | sed 's/[&/\]/\\&/g')
+                CONTENT=$(printf '%s\n' "$CONTENT" | sed "s/$WRONG_ESCAPED/$CORRECT_ESCAPED/g")
             fi
         done < "$yaml_file"
     fi
