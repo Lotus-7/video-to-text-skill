@@ -23,12 +23,14 @@ fi
 TRADITIONAL_SAMPLE="個們來過對還時會機樣這麼種樣資專案軟體網路程式資料庫硬碟伺服器滑鼠資料夾"
 
 # 使用 grep 高效统计中文字符总数 (CJK Unified Ideographs 范围)
-TOTAL_CHARS=$(grep -o '[一-龥]' "$TXT_FILE" 2>/dev/null | wc -l | tr -d ' ' || echo "0")
+TOTAL_CHARS=$(grep -o '[一-龥]' "$TXT_FILE" 2>/dev/null | wc -l | tr -d ' ' || true)
+TOTAL_CHARS=${TOTAL_CHARS:-0}
 
 # 统计繁体字样本的出现次数
 TRAD_COUNT=0
 for char in $(echo "$TRADITIONAL_SAMPLE" | grep -o .); do
-    COUNT=$(grep -o "$char" "$TXT_FILE" 2>/dev/null | wc -l | tr -d ' ' || echo "0")
+    COUNT=$(grep -o "$char" "$TXT_FILE" 2>/dev/null | wc -l | tr -d ' ' || true)
+    COUNT=${COUNT:-0}
     TRAD_COUNT=$((TRAD_COUNT + COUNT))
 done
 
