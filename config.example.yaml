@@ -1,0 +1,22 @@
+# Video-to-Text 工作流配置文件
+
+# 默认输出目录
+output_dir: ~/Desktop/video-to-text
+
+# 默认是否进入审核模式
+review_mode: false
+
+# 是否保留原始转录文件
+keep_original: true
+
+# 是否生成校对报告
+generate_report: true
+
+# 并发下载数量
+max_concurrent_downloads: 2
+
+# 转录模型 (medium/large/small)
+whisper_model: medium
+
+# 简繁转换工具 (opencc/builtin)
+traditional_converter: builtin
